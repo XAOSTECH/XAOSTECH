@@ -1,0 +1,33 @@
+[submodule "account.xaostech.io"]
+	path = account.xaostech.io
+	url = https://github.com/XAOSTECH/account.xaostech.io.git
+
+[submodule "api.xaostech.io"]
+	path = api.xaostech.io
+	url = https://github.com/XAOSTECH/api.xaostech.io.git
+
+[submodule "chat.xaostech.io"]
+	path = chat.xaostech.io
+	url = https://github.com/XAOSTECH/chat.xaostech.io.git
+
+[submodule "data.xaostech.io"]
+	path = data.xaostech.io
+	url = https://github.com/XAOSTECH/data.xaostech.io.git
+
+[submodule "lingua.xaostech.io"]
+	path = lingua.xaostech.io
+	url = https://github.com/XAOSTECH/lingua.xaostech.io.git
+
+[submodule "payments.xaostech.io"]
+	path = payments.xaostech.io
+	url = https://github.com/XAOSTECH/payments.xaostech.io.git
+
+[submodule "portfolio.xaostech.io"]
+	path = portfolio.xaostech.io
+	url = https://github.com/XAOSTECH/portfolio.xaostech.io.git
+
+[submodule "xaostech.io"]
+	path = xaostech.io
+	url = https://github.com/XAOSTECH/webfront-worker.git
+
+
