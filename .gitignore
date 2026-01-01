@@ -23,6 +23,7 @@ build/
 .env
 .env.local
 *.env
+.tmp
 
 # Logs
 *.log

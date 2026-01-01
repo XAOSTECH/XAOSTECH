@@ -6,6 +6,10 @@
 	path = api.xaostech.io
 	url = https://github.com/XAOSTECH/api.xaostech.io.git
 
+[submodule "blog.xaostech.io"]
+	path = blog.xaostech.io
+	url = https://github.com/XAOSTECH/blog.xaostech.io.git
+
 [submodule "chat.xaostech.io"]
 	path = chat.xaostech.io
 	url = https://github.com/XAOSTECH/chat.xaostech.io.git
@@ -28,6 +32,6 @@
 
 [submodule "xaostech.io"]
 	path = xaostech.io
-	url = https://github.com/XAOSTECH/webfront-worker.git
+	url = https://github.com/XAOSTECH/xaostech.io.git
 
 

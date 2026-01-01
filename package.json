@@ -3,8 +3,9 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "dev:all": "concurrently \"npm --prefix xaostech.io run dev\" \"npm --prefix api.xaostech.io run dev\" \"npm --prefix account.xaostech.io run dev\" \"npm --prefix data.xaostech.io run dev\" \"npm --prefix lingua.xaostech.io run dev\" \"npm --prefix chat.xaostech.io run dev\" \"npm --prefix payments.xaostech.io run dev\" \"npm --prefix portfolio.xaostech.io run dev\"",
-    "install:all": "npm install && npm --prefix xaostech.io install && npm --prefix api.xaostech.io install && npm --prefix account.xaostech.io install && npm --prefix data.xaostech.io install && npm --prefix lingua.xaostech.io install && npm --prefix chat.xaostech.io install && npm --prefix payments.xaostech.io install && npm --prefix portfolio.xaostech.io install"
+    "dev:all": "concurrently \"npm --prefix xaostech.io run dev\" \"npm --prefix api.xaostech.io run dev\" \"npm --prefix account.xaostech.io run dev\" \"npm --prefix data.xaostech.io run dev\" \"npm --prefix blog.xaostech.io run dev\" \"npm --prefix lingua.xaostech.io run dev\" \"npm --prefix chat.xaostech.io run dev\" \"npm --prefix payments.xaostech.io run dev\" \"npm --prefix portfolio.xaostech.io run dev\"",
+    "install:all": "npm install && npm --prefix xaostech.io install && npm --prefix api.xaostech.io install && npm --prefix account.xaostech.io install && npm --prefix data.xaostech.io install && npm --prefix blog.xaostech.io install && npm --prefix lingua.xaostech.io install && npm --prefix chat.xaostech.io install && npm --prefix payments.xaostech.io install && npm --prefix portfolio.xaostech.io install",
+    "deploy:all": "npm --prefix api.xaostech.io run deploy && npm --prefix account.xaostech.io run deploy && npm --prefix blog.xaostech.io run deploy && npm --prefix data.xaostech.io run deploy && npm --prefix lingua.xaostech.io run deploy && npm --prefix chat.xaostech.io run deploy && npm --prefix payments.xaostech.io run deploy"
   },
   "devDependencies": {
     "concurrently": "latest"

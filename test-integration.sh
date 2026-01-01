@@ -10,9 +10,10 @@ echo "================================"
 DATA_PORT=8787
 AUTH_PORT=8788
 API_PORT=8789
-LINGUA_PORT=8790
-CHAT_PORT=8791
-PAYMENTS_PORT=8792
+BLOG_PORT=8790
+LINGUA_PORT=8791
+CHAT_PORT=8792
+PAYMENTS_PORT=8793
 XAOSTECH_PORT=3000
 PORTFOLIO_PORT=3001
 
@@ -21,6 +22,7 @@ echo "📍 Service URLs:"
 echo "  data.xaostech.io:      http://localhost:$DATA_PORT"
 echo "  account.xaostech.io:      http://localhost:$AUTH_PORT"
 echo "  api.xaostech.io:       http://localhost:$API_PORT"
+echo "  blog.xaostech.io:      http://localhost:$BLOG_PORT"
 echo "  lingua.xaostech.io:    http://localhost:$LINGUA_PORT"
 echo "  chat.xaostech.io:      http://localhost:$CHAT_PORT"
 echo "  payments.xaostech.io:  http://localhost:$PAYMENTS_PORT"
@@ -65,7 +67,25 @@ echo "GET tasks:"
 curl -s http://localhost:$API_PORT/tasks | jq . | head -20
 echo ""
 
-echo "4️⃣  Testing Lingua Worker (Translation Caching)"
+echo "4️⃣  Testing Blog Worker (Posts, Walls, Comments)"
+echo "──────────────────────────────────────────────"
+echo "GET health:"
+curl -s http://localhost:$BLOG_PORT/health | jq .
+echo ""
+echo "GET posts (published list):"
+curl -s http://localhost:$BLOG_PORT/posts | jq .
+echo ""
+echo "GET message walls:"
+curl -s http://localhost:$BLOG_PORT/walls | jq .
+echo ""
+echo "POST comment to wall (requires wall ID from above):"
+# Note: replace wall-id-here with actual ID if testing
+curl -s -X POST http://localhost:$BLOG_PORT/walls/wall-id-here/comments \
+  -H "Content-Type: application/json" \
+  -d '{"content":"Great content!","author_name":"Test User"}' | jq .
+echo ""
+
+echo "5️⃣  Testing Lingua Worker (Translation Caching)"
 echo "───────────────────────────────────────────────"
 echo "POST translate (first call):"
 TRANS1=$(curl -s -X POST http://localhost:$LINGUA_PORT/translate \
