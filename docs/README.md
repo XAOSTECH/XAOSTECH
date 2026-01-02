@@ -282,13 +282,13 @@ const url = await bucket.put(`blog/${postId}/photo.jpg`, file);
 
 ## ⚙️ Configuration & Deployment
 
-### Step 1: Fill Cloudflare Secrets
+### Step 1: Provide Cloudflare build secrets (preferred) or regular secrets (alternative)
+
+We prefer using Cloudflare **Build Secrets** (see [Cloudflare documentation](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)) and the repository's build-time injection flow. The build command (see [`config/buildConfig.md`](../config/buildConfig.md)) clones shared content and runs [`shared/injectEnv.sh`](../shared/injectEnv.sh), which injects the required Cloudflare IDs into each worker's `wrangler.toml` at build time.
+
+#### Alternative: set regular worker secrets through dashboard or CLI
 
 ```bash
-# In each worker folder:
-cd api.xaostech.io
-
-# Add production secrets (one-time setup)
 wrangler secret put D1_DATABASE_ID          # From Cloudflare dashboard
 wrangler secret put STRIPE_WEBHOOK_SECRET   # From Stripe dashboard
 wrangler secret put R2_BUCKET_NAME          # Your R2 bucket name

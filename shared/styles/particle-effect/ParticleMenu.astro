@@ -1,0 +1,304 @@
+---
+// ParticleMenu.astro - Shared particle animation menu component
+export interface Props {
+  items: Array<{
+    label: string;
+    href: string;
+    icon?: string;
+  }>;
+  title?: string;
+  subtitle?: string;
+}
+
+const { items, title = 'Menu', subtitle = 'Welcome' } = Astro.props;
+---
+
+<div class="animated-menu-container">
+  <canvas id="particle-canvas"></canvas>
+  
+  <div class="menu-overlay">
+    <div class="menu-header">
+      <h1>{title}</h1>
+      <p class="subtitle">{subtitle}</p>
+    </div>
+
+    <nav class="menu-grid">
+      {items.map((item) => (
+        <a href={item.href} class="menu-item" data-label={item.label}>
+          <span class="menu-label">{item.label}</span>
+          {item.icon && <span class="menu-icon" set:html={item.icon} />}
+        </a>
+      ))}
+    </nav>
+
+    <footer class="menu-footer">
+      <p>&copy; 2026 XAOSTECH. All rights reserved.</p>
+    </footer>
+  </div>
+</div>
+
+<script>
+  class ParticleAnimation {
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    particles: any[] = [];
+    mouse = { x: 0, y: 0 };
+    animationId: number | null = null;
+
+    constructor(canvasId: string) {
+      this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+      this.ctx = this.canvas.getContext('2d')!;
+      this.resize();
+      this.setupParticles();
+      this.setupEventListeners();
+      this.animate();
+    }
+
+    resize() {
+      this.canvas.width = window.innerWidth;
+      this.canvas.height = window.innerHeight;
+    }
+
+    setupParticles() {
+      const particleCount = 50;
+      for (let i = 0; i < particleCount; i++) {
+        this.particles.push({
+          x: Math.random() * this.canvas.width,
+          y: Math.random() * this.canvas.height,
+          vx: (Math.random() - 0.5) * 2,
+          vy: (Math.random() - 0.5) * 2,
+          radius: Math.random() * 2 + 1,
+          life: Math.random() * 100 + 50,
+          maxLife: 150,
+          hue: Math.random() * 360,
+        });
+      }
+    }
+
+    setupEventListeners() {
+      window.addEventListener('resize', () => this.resize());
+      document.addEventListener('mousemove', (e) => {
+        this.mouse.x = e.clientX;
+        this.mouse.y = e.clientY;
+      });
+    }
+
+    update() {
+      this.particles.forEach((p, idx) => {
+        // Movement
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Attraction to mouse
+        const dx = this.mouse.x - p.x;
+        const dy = this.mouse.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 150) {
+          p.vx += (dx / dist) * 0.05;
+          p.vy += (dy / dist) * 0.05;
+        }
+
+        // Damping
+        p.vx *= 0.98;
+        p.vy *= 0.98;
+
+        // Bounce off edges
+        if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
+
+        // Keep in bounds
+        p.x = Math.max(0, Math.min(this.canvas.width, p.x));
+        p.y = Math.max(0, Math.min(this.canvas.height, p.y));
+
+        // Life cycle
+        p.life--;
+        if (p.life < 0) {
+          p.x = Math.random() * this.canvas.width;
+          p.y = Math.random() * this.canvas.height;
+          p.life = p.maxLife;
+        }
+      });
+    }
+
+    draw() {
+      // Clear canvas with fade
+      this.ctx.fillStyle = 'rgba(10, 10, 20, 0.1)';
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+      // Draw particles
+      this.particles.forEach((p) => {
+        const opacity = (p.life / p.maxLife) * 0.8;
+        this.ctx.fillStyle = `hsla(${p.hue}, 100%, 60%, ${opacity})`;
+        this.ctx.beginPath();
+        this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Draw connection lines
+        this.particles.forEach((p2) => {
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 100 && dist > 0) {
+            const lineOpacity = (1 - dist / 100) * opacity * 0.5;
+            this.ctx.strokeStyle = `hsla(${p.hue}, 100%, 60%, ${lineOpacity})`;
+            this.ctx.lineWidth = 1;
+            this.ctx.beginPath();
+            this.ctx.moveTo(p.x, p.y);
+            this.ctx.lineTo(p2.x, p2.y);
+            this.ctx.stroke();
+          }
+        });
+      });
+    }
+
+    animate = () => {
+      this.update();
+      this.draw();
+      this.animationId = requestAnimationFrame(this.animate);
+    };
+
+    destroy() {
+      if (this.animationId) cancelAnimationFrame(this.animationId);
+    }
+  }
+
+  // Initialize on page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      new ParticleAnimation('particle-canvas');
+    });
+  } else {
+    new ParticleAnimation('particle-canvas');
+  }
+</script>
+
+<style>
+  .animated-menu-container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0a0a14 0%, #1a0a2e 100%);
+  }
+
+  #particle-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .menu-overlay {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+    padding: 2rem;
+    text-align: center;
+    color: #fff;
+  }
+
+  .menu-header {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .menu-header h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(90deg, #ff006e 0%, #ffbe0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.15em;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
+    color: #aaa;
+    margin: 0;
+    font-weight: 300;
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    max-width: 900px;
+    margin: 2rem 0;
+    flex: 1;
+    align-content: center;
+  }
+
+  .menu-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    border: 2px solid rgba(255, 190, 11, 0.3);
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: rgba(255, 190, 11, 0.05);
+    cursor: pointer;
+  }
+
+  .menu-item:hover {
+    border-color: #ffbe0b;
+    background: rgba(255, 190, 11, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(255, 190, 11, 0.2);
+  }
+
+  .menu-label {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .menu-icon {
+    font-size: 2rem;
+  }
+
+  .menu-footer {
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .menu-footer p {
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .menu-header h1 {
+      font-size: 2.5rem;
+    }
+
+    .menu-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .menu-item {
+      padding: 1rem;
+    }
+  }
+</style>
