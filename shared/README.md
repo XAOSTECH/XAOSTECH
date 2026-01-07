@@ -6,9 +6,6 @@ This folder contains shared resources used across all XAOSTECH projects.
 
 - **types/** - TypeScript types, utilities, and handlers
   - `api-proxy.ts` - Shared API proxy handler for Astro projects
-  - `route-proxy.ts` - Shared route proxy handler for Astro/generic workers (maps path prefixes like `/portfolio` to target subdomains)
-  - `api-proxy-hono.ts` - Hono-compatible API proxy
-  - `route-proxy-hono.ts` - Hono-compatible route proxy
   
 - **styles/** - Shared CSS/SCSS stylesheets
   
@@ -22,6 +19,10 @@ Import from the `types/` folder:
 
 ```typescript
 import { createProxyHandler } from '../shared/types/api-proxy';
+
+- Use the canonical asset proxy path: `/api/data/assets/{filename}` so that the local worker proxies to `api.xaostech.io/data/assets/{filename}` which injects CF Access service-token headers.
+
+- Security headers: We add a global Content-Security-Policy and related security headers (HSTS, Referrer-Policy, Permissions-Policy, X-Content-Type-Options) in workers to reduce attack surface. See `shared/types/security.ts` for the canonical settings and `scripts/check_security_headers.sh` for a quick smoke-check script.
 ```
 
 ### Environment Injection

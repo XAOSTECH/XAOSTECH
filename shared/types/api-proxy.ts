@@ -4,6 +4,7 @@
  */
 
 import type { APIRoute } from 'astro';
+import type { ProxyEnv } from './env';
 
 export const createProxyHandler = (): APIRoute => {
   return async (context) => {
@@ -16,41 +17,17 @@ export const createProxyHandler = (): APIRoute => {
     try {
       console.log('[api-proxy] Proxying request to api.xaostech.io:', pathname);
 
-      // Access Cloudflare environment via locals.runtime.env
-      // In Cloudflare Pages with Astro, secrets are available here during runtime
-      const cfContext = (locals as any).cf;
+      // Use runtime env only (prefer runtime.env or locals.env) and read API_ACCESS_* directly
       const runtime = (locals as any).runtime;
-      
-      console.log('[api-proxy] Available context keys:', Object.keys(locals || {}));
-      console.log('[api-proxy] Runtime available:', !!runtime);
-      console.log('[api-proxy] CF context available:', !!cfContext);
 
-      // Get environment from runtime binding; include fallbacks for different runtime shapes
-      // Cloudflare Pages / Astro expose env via locals.runtime.env; other runtimes may use locals.env or locals.bindings
-      const env = runtime?.env || (locals as any).env || (locals as any).bindings || (locals as any).runtime?.env || {};
+      // Use runtime env only (prefer runtime.env or locals.env) and read API_ACCESS_* directly
+      const env = (runtime?.env || (locals as any).env || {}) as ProxyEnv;
+      const clientId = env.API_ACCESS_CLIENT_ID;
+      const clientSecret = env.API_ACCESS_CLIENT_SECRET;
 
-      const clientId = env.CF_ACCESS_CLIENT_ID || (runtime && (runtime.CF_ACCESS_CLIENT_ID as string));
-      const clientSecret = env.CF_ACCESS_CLIENT_SECRET || (runtime && (runtime.CF_ACCESS_CLIENT_SECRET as string));
-
-      console.log(
-        '[api-proxy] CF_ACCESS_CLIENT_ID available:',
-        !!clientId,
-        'length:',
-        clientId?.length || 0
-      );
-      console.log(
-        '[api-proxy] CF_ACCESS_CLIENT_SECRET available:',
-        !!clientSecret,
-        'length:',
-        clientSecret?.length || 0
-      );
-      console.log('[api-proxy] Full env keys:', Object.keys(env));
 
       // Build proxied URL
-      const proxiedUrl = new URL(
-        pathname + url.search,
-        'https://api.xaostech.io'
-      );
+      const proxiedUrl = new URL(pathname + url.search, 'https://api.xaostech.io');
 
       // Build outgoing headers: avoid copying hop-by-hop headers like Host
       const headers = new Headers();
@@ -60,17 +37,25 @@ export const createProxyHandler = (): APIRoute => {
         headers.set(k, v);
       }
 
+      // Add a proxy source header for tracing in data worker logs and a short random trace id
+      headers.set('X-Proxy-Source', 'api-proxy');
+      const traceId = Math.random().toString(16).slice(2, 10);
+      headers.set('X-Trace-Id', traceId);
+
+      const safeLog = {
+        traceId,
+        hasCfAccessId: !!clientId,
+        hasCfAccessSecret: !!clientSecret,
+        proxiedPath: pathname
+      };
+      console.debug('[api-proxy] Outgoing header presence:', safeLog);
+
       if (clientId && clientSecret) {
-        // Use the canonical header names as shown in Cloudflare docs
+        // Send Cloudflare-compatible headers upstream (do NOT log secrets)
         headers.set('CF-Access-Client-Id', clientId);
         headers.set('CF-Access-Client-Secret', clientSecret);
-        // Non-sensitive flag for upstream detection
-        headers.set('X-Proxy-CF-Injected', 'true');
-        console.log('[api-proxy] Added CF_ACCESS authentication headers');
       } else {
-        console.warn(
-          '[api-proxy] Missing CF_ACCESS credentials - request may fail'
-        );
+        console.warn('[api-proxy] Missing API_ACCESS_CLIENT_ID/SECRET; forwarding without auth', { traceId });
       }
 
       // Proxy the request
@@ -87,10 +72,6 @@ export const createProxyHandler = (): APIRoute => {
       const response = await fetch(proxiedRequest);
 
       console.log('[api-proxy] Response status:', response.status);
-      console.log(
-        '[api-proxy] Response content-type:',
-        response.headers.get('content-type')
-      );
 
       // Return the response with appropriate headers
       return new Response(response.body, {

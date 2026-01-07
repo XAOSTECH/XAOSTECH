@@ -4,12 +4,7 @@
  */
 
 import type { HonoRequest, Context } from 'hono';
-
-export interface ProxyEnv {
-  CF_ACCESS_CLIENT_ID?: string;
-  CF_ACCESS_CLIENT_SECRET?: string;
-  [key: string]: any;
-}
+import type { ProxyEnv } from './env';
 
 export const createApiProxyRoute = () => {
   return async (c: Context) => {
@@ -22,20 +17,13 @@ export const createApiProxyRoute = () => {
 
       console.log('[api-proxy] Proxying request to api.xaostech.io:', pathname);
 
-      // Get environment variables for CF_ACCESS authentication
+      // Use API_ACCESS_* from worker env only (no fallbacks)
       const env = c.env as ProxyEnv;
-      const processEnv = (globalThis as any)?.process?.env;
-      const clientId = env.CF_ACCESS_CLIENT_ID || (processEnv && processEnv.CF_ACCESS_CLIENT_ID);
-      const clientSecret = env.CF_ACCESS_CLIENT_SECRET || (processEnv && processEnv.CF_ACCESS_CLIENT_SECRET);
-
-      console.log('[api-proxy] c.env has CF_ACCESS_CLIENT_ID:', !!env.CF_ACCESS_CLIENT_ID);
-      console.log('[api-proxy] process.env has CF_ACCESS_CLIENT_ID:', !!(processEnv && processEnv.CF_ACCESS_CLIENT_ID));
+      const clientId = env.API_ACCESS_CLIENT_ID;
+      const clientSecret = env.API_ACCESS_CLIENT_SECRET;
 
       // Build proxied URL
-      const proxiedUrl = new URL(
-        pathname + url.search,
-        'https://api.xaostech.io'
-      );
+      const proxiedUrl = new URL(pathname + url.search, 'https://api.xaostech.io');
 
       // Build outgoing headers and avoid hop-by-hop headers like Host
       const headers = new Headers();
@@ -46,14 +34,11 @@ export const createApiProxyRoute = () => {
       }
 
       if (clientId && clientSecret) {
-        // Use canonical header names as in Cloudflare docs
+        // Send Cloudflare-compatible headers upstream
         headers.set('CF-Access-Client-Id', clientId);
         headers.set('CF-Access-Client-Secret', clientSecret);
-        // Add a non-sensitive diagnostic header so the upstream API can detect injection
-        headers.set('X-Proxy-CF-Injected', 'true');
-        console.log('[api-proxy] Added CF_ACCESS authentication headers');
       } else {
-        console.warn('[api-proxy] Missing CF_ACCESS credentials - request may fail');
+        console.warn('[api-proxy] Missing API_ACCESS_CLIENT_ID/SECRET; forwarding without auth');
       }
 
       // Proxy the request
