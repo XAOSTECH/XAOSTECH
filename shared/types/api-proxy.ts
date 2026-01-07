@@ -25,11 +25,12 @@ export const createProxyHandler = (): APIRoute => {
       console.log('[api-proxy] Runtime available:', !!runtime);
       console.log('[api-proxy] CF context available:', !!cfContext);
 
-      // Get environment from runtime binding
-      const env = runtime?.env || {};
-      
-      const clientId = env.CF_ACCESS_CLIENT_ID;
-      const clientSecret = env.CF_ACCESS_CLIENT_SECRET;
+      // Get environment from runtime binding; include fallbacks for different runtime shapes
+      // Cloudflare Pages / Astro expose env via locals.runtime.env; other runtimes may use locals.env or locals.bindings
+      const env = runtime?.env || (locals as any).env || (locals as any).bindings || (locals as any).runtime?.env || {};
+
+      const clientId = env.CF_ACCESS_CLIENT_ID || (runtime && (runtime.CF_ACCESS_CLIENT_ID as string));
+      const clientSecret = env.CF_ACCESS_CLIENT_SECRET || (runtime && (runtime.CF_ACCESS_CLIENT_SECRET as string));
 
       console.log(
         '[api-proxy] CF_ACCESS_CLIENT_ID available:',
@@ -51,13 +52,20 @@ export const createProxyHandler = (): APIRoute => {
         'https://api.xaostech.io'
       );
 
-      // Copy headers and add service token auth
-      const headers = new Headers(request.headers);
-      headers.set('Host', 'api.xaostech.io');
+      // Build outgoing headers: avoid copying hop-by-hop headers like Host
+      const headers = new Headers();
+      for (const [k, v] of request.headers) {
+        const lk = k.toLowerCase();
+        if (['host', 'connection', 'content-length', 'transfer-encoding', 'upgrade', 'keep-alive'].includes(lk)) continue;
+        headers.set(k, v);
+      }
 
       if (clientId && clientSecret) {
-        headers.set('Cf-Access-Client-Id', clientId);
-        headers.set('Cf-Access-Client-Secret', clientSecret);
+        // Use the canonical header names as shown in Cloudflare docs
+        headers.set('CF-Access-Client-Id', clientId);
+        headers.set('CF-Access-Client-Secret', clientSecret);
+        // Non-sensitive flag for upstream detection
+        headers.set('X-Proxy-CF-Injected', 'true');
         console.log('[api-proxy] Added CF_ACCESS authentication headers');
       } else {
         console.warn(

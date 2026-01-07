@@ -6,6 +6,9 @@ This folder contains shared resources used across all XAOSTECH projects.
 
 - **types/** - TypeScript types, utilities, and handlers
   - `api-proxy.ts` - Shared API proxy handler for Astro projects
+  - `route-proxy.ts` - Shared route proxy handler for Astro/generic workers (maps path prefixes like `/portfolio` to target subdomains)
+  - `api-proxy-hono.ts` - Hono-compatible API proxy
+  - `route-proxy-hono.ts` - Hono-compatible route proxy
   
 - **styles/** - Shared CSS/SCSS stylesheets
   
