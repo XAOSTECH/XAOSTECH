@@ -20,6 +20,20 @@ jobs:
         with:
           node-version: '22'
 
+      # Inject shared/ folder into each worker that needs it
+      # Workers import from '../shared/types/*' which resolves relative to src/
+      # e.g., src/index.ts importing '../shared/types/security' resolves to
+      # workerDir/shared/types/security (one level up from src/)
+      - name: Inject shared folder into workers
+        run: |
+          for worker in account.xaostech.io api.xaostech.io blog.xaostech.io chat.xaostech.io data.xaostech.io lingua.xaostech.io payments.xaostech.io portfolio.xaostech.io xaostech.io; do
+            if [ -d "$worker" ]; then
+              echo "Injecting shared/ into $worker..."
+              rm -rf "$worker/shared"
+              cp -r shared "$worker/shared"
+            fi
+          done
+
       - name: Deploy account worker
         id: account
         continue-on-error: true

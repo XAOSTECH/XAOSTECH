@@ -17,11 +17,9 @@ export const createProxyHandler = (): APIRoute => {
     try {
       console.log('[api-proxy] Proxying request to api.xaostech.io:', pathname);
 
-      // Use runtime env only (prefer runtime.env or locals.env) and read API_ACCESS_* directly
-      const runtime = (locals as any).runtime;
-
-      // Use runtime env only (prefer runtime.env or locals.env) and read API_ACCESS_* directly
-      const env = (runtime?.env || (locals as any).env || {}) as ProxyEnv;
+      // Access runtime secrets from Cloudflare adapter context
+      // In @astrojs/cloudflare, secrets are available at locals.runtime.env
+      const env = (locals as any).runtime?.env || {};
       const clientId = env.API_ACCESS_CLIENT_ID;
       const clientSecret = env.API_ACCESS_CLIENT_SECRET;
 

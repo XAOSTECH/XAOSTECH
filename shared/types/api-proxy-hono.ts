@@ -74,3 +74,8 @@ export const createApiProxyRoute = () => {
     }
   };
 };
+
+// Note: DATA-specific access helpers moved to api.xaostech.io/src/lib/data-proxy.ts
+// The shared Hono proxy should remain generic — it only proxies to api.xaostech.io and injects API_ACCESS headers from the worker env.
+
+

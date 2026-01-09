@@ -15,9 +15,11 @@ sed -i "s/\${D1_BLOG_DB_ID}/${D1_BLOG_DB_ID}/g" "wrangler.toml"
 sed -i "s/\${D1_DATA_DB_ID}/${D1_DATA_DB_ID}/g" "wrangler.toml"
 sed -i "s/\${D1_PAYMENTS_DB_ID}/${D1_PAYMENTS_DB_ID}/g" "wrangler.toml"
 echo "✓ Build secrets loaded"
+set -x
 if [ -f "astro.config.mjs" ]; then
   echo "Syncing shared pages and routes for Astro workers"
-    mkdir -p "src/pages"
-    cp -a --update=none "shared/pages/." "src/pages/"
+    mkdir -p "src/pages/api"
+    mv "shared/pages/api/[...path].ts" "src/pages/api/"
+    mv "shared/pages/favicon.ico.ts" "src/pages/" 
 fi
 rm -r "shared/pages"
