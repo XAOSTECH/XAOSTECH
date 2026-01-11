@@ -1,13 +1,15 @@
 // Shared security headers and utilities
 
-// Content Security Policy - Restrictive by default, but allows legitimate external resources
-// 'unsafe-inline' is NOT used - use nonces or hashes for inline resources instead
-// GitHub OAuth redirect (login page) bypasses this via middleware exception
-export const CSP = "frame-ancestors 'none'; default-src 'self'; connect-src 'self' https: wss:; img-src 'any' data: https:; style-src 'self' https:; script-src 'self' https:; object-src 'none'";
+// CSP Policies
+export const CSP_STRICT = "frame-ancestors 'none'; default-src 'self'; connect-src 'self' https: wss:; img-src 'self' data:; style-src 'self' https:; script-src 'self' https:; object-src 'none'";
+export const CSP_RELAXED = "frame-ancestors 'none'; default-src 'self'; connect-src 'self' https: wss:; img-src 'self' data: https:; style-src 'self' https: 'unsafe-inline'; script-src 'self' https:; object-src 'none'";
 
-export function getSecurityHeaders() {
+// Default to strict CSP
+export const CSP = CSP_STRICT;
+
+export function getSecurityHeaders(cspPolicy: string = CSP_STRICT) {
   return {
-    'Content-Security-Policy': CSP,
+    'Content-Security-Policy': cspPolicy,
     'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'geolocation=(), microphone=(), camera=(), usb=(), gyroscope=(), accelerometer=(), ambient-light-sensor=(), magnetometer=()',
@@ -15,9 +17,9 @@ export function getSecurityHeaders() {
   } as Record<string, string>;
 }
 
-export function applySecurityHeaders(response: Response) {
+export function applySecurityHeaders(response: Response, cspPolicy: string = CSP_STRICT) {
   const headers = new Headers(response.headers || {});
-  const sec = getSecurityHeaders();
+  const sec = getSecurityHeaders(cspPolicy);
   for (const k of Object.keys(sec)) {
     headers.set(k, sec[k]);
   }
