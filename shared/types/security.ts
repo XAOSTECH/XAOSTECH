@@ -1,8 +1,9 @@
 // Shared security headers and utilities
 
-// Content Security Policy - 'unsafe-inline' intentionally omitted to avoid allowing inline scripts/styles.
+// Content Security Policy - comprehensive policy with font-src for Google Fonts and self-hosted fonts
+// 'unsafe-inline' intentionally omitted to avoid allowing inline scripts/styles.
 // To allow specific inline resources, use nonces or hashes per response instead of 'unsafe-inline'.
-export const CSP = "frame-ancestors 'none'; default-src 'self' https:; connect-src 'self' https: wss:; img-src 'self' data: https:; style-src 'self' https:; script-src 'self' https:; object-src 'none'";
+export const CSP = "frame-ancestors 'none'; default-src 'self' https:; connect-src 'self' https: wss:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https:; font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com; script-src 'self' https:; object-src 'none'";
 
 export function getSecurityHeaders() {
   return {
