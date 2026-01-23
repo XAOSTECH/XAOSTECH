@@ -18,6 +18,10 @@
 	path = data.xaostech.io
 	url = https://github.com/XAOSTECH/data.xaostech.io.git
 
+[submodule "edu.xaostech.io"]
+	path = edu.xaostech.io
+	url = https://github.com/XAOSTECH/edu.xaostech.io.git
+
 [submodule "lingua.xaostech.io"]
 	path = lingua.xaostech.io
 	url = https://github.com/XAOSTECH/lingua.xaostech.io.git

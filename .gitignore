@@ -20,6 +20,7 @@ build/
 *.egg-info/
 
 # Environment
+.devcontainer
 .env
 .env.local
 *.env

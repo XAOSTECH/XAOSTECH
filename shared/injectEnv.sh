@@ -14,6 +14,9 @@ sed -i "s/\${D1_API_DB_ID}/${D1_API_DB_ID}/g" "wrangler.toml"
 sed -i "s/\${D1_BLOG_DB_ID}/${D1_BLOG_DB_ID}/g" "wrangler.toml"
 sed -i "s/\${D1_DATA_DB_ID}/${D1_DATA_DB_ID}/g" "wrangler.toml"
 sed -i "s/\${D1_PAYMENTS_DB_ID}/${D1_PAYMENTS_DB_ID}/g" "wrangler.toml"
+sed -i "s/\${KV_EXERCISES_ID}/${KV_EXERCISES_ID}/g" "wrangler.toml"
+sed -i "s/\${KV_PROGRESS_ID}/${KV_PROGRESS_ID}/g" "wrangler.toml"
+sed -i "s/\${D1_EDU_DB_ID}/${D1_EDU_DB_ID}/g" "wrangler.toml"
 echo "✓ Build secrets loaded"
 set -x
 if [ -f "astro.config.mjs" ]; then
