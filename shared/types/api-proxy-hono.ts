@@ -45,7 +45,9 @@ export const createApiProxyRoute = () => {
         console.warn('[api-proxy] Missing API_ACCESS_CLIENT_ID/SECRET; forwarding without auth');
       }
 
-      // Proxy the request
+      // Proxy the request - use redirect: 'manual' to pass redirects back to browser
+      // This is critical for OAuth flows where the browser must follow redirects
+      // to maintain its own session cookies with the OAuth provider
       const proxiedRequest = new Request(proxiedUrl, {
         method: request.method,
         headers,
@@ -53,6 +55,7 @@ export const createApiProxyRoute = () => {
           request.method !== 'GET' && request.method !== 'HEAD'
             ? await request.text()
             : undefined,
+        redirect: 'manual',
       });
 
       console.log('[api-proxy] Fetching from:', proxiedUrl.toString());
