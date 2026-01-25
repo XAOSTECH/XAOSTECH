@@ -33,6 +33,10 @@ export const createApiProxyRoute = () => {
         headers.set(k, v);
       }
 
+      // Forward original host for OAuth callbacks to redirect correctly
+      headers.set('X-Forwarded-Host', url.host);
+      headers.set('X-Forwarded-Proto', url.protocol.replace(':', ''));
+
       if (clientId && clientSecret) {
         // Send Cloudflare-compatible headers upstream
         headers.set('CF-Access-Client-Id', clientId);
