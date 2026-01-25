@@ -7,7 +7,7 @@ sed -i "s/\${KV_SESSIONS_ID}/${KV_SESSIONS_ID}/g" "wrangler.toml"
 sed -i "s/\${KV_MESSAGES_ID}/${KV_MESSAGES_ID}/g" "wrangler.toml"
 sed -i "s/\${KV_CONSENT_ID}/${KV_CONSENT_ID}/g" "wrangler.toml"
 sed -i "s/\${KV_TRANSLATIONS_ID}/${KV_TRANSLATIONS_ID}/g" "wrangler.toml"
-sed -i "s/\${KV_LEARNED_WORDS_ID/${KV_LEARNED_WORDS_ID}/g" "wrangler.toml"
+sed -i "s/\${KV_LEARNED_WORDS_ID}/${KV_LEARNED_WORDS_ID}/g" "wrangler.toml"
 sed -i "s/\${KV_CACHE_ID}/${KV_CACHE_ID}/g" "wrangler.toml"
 sed -i "s/\${KV_BLOG_MEDIA_ID}/${KV_BLOG_MEDIA_ID}/g" "wrangler.toml"
 sed -i "s/\${D1_ACCOUNT_DB_ID}/${D1_ACCOUNT_DB_ID}/g" "wrangler.toml"
@@ -18,6 +18,16 @@ sed -i "s/\${D1_PAYMENTS_DB_ID}/${D1_PAYMENTS_DB_ID}/g" "wrangler.toml"
 sed -i "s/\${KV_EXERCISES_ID}/${KV_EXERCISES_ID}/g" "wrangler.toml"
 sed -i "s/\${KV_PROGRESS_ID}/${KV_PROGRESS_ID}/g" "wrangler.toml"
 sed -i "s/\${D1_EDU_DB_ID}/${D1_EDU_DB_ID}/g" "wrangler.toml"
+
+# AI Worker
+sed -i "s/\${KV_AI_CACHE_ID}/${KV_AI_CACHE_ID}/g" "wrangler.toml"
+sed -i "s/\${KV_AI_TRAINING_ID}/${KV_AI_TRAINING_ID}/g" "wrangler.toml"
+sed -i "s/\${D1_AI_DB_ID}/${D1_AI_DB_ID}/g" "wrangler.toml"
+
+# Security Worker
+sed -i "s/\${KV_SECURITY_CACHE_ID}/${KV_SECURITY_CACHE_ID}/g" "wrangler.toml"
+sed -i "s/\${D1_SECURITY_DB_ID}/${D1_SECURITY_DB_ID}/g" "wrangler.toml"
+
 echo "✓ Build secrets loaded"
 set -x
 if [ -f "astro.config.mjs" ]; then
