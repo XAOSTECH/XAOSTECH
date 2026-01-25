@@ -38,6 +38,10 @@
 	path = portfolio.xaostech.io
 	url = https://github.com/XAOSTECH/portfolio.xaostech.io.git
 
+[submodule "security.xaostech.io"]
+	path = security.xaostech.io
+	url = https://github.com/xaoscience/security.xaostech.io.git
+
 [submodule "xaostech.io"]
 	path = xaostech.io
 	url = https://github.com/XAOSTECH/xaostech.io.git

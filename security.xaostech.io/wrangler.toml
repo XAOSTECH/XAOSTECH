@@ -22,12 +22,12 @@ name = "xaostech-security"
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "security-alerts"
-database_id = "placeholder-create-via-wrangler"
+database_id = "${D1_SECURITY_DB_ID}"
 
 # KV for caching and state
 [[env.production.kv_namespaces]]
 binding = "CACHE"
-id = "placeholder-create-via-wrangler"
+id = "${KV_SECURITY_CACHE_ID}"
 
 # Secrets (set via wrangler secret put):
 # - GITHUB_APP_ID: GitHub App ID
