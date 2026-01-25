@@ -1,0 +1,39 @@
+# ⚠️  PRIVATE - DO NOT PUBLISH TO PUBLIC REPO
+# This worker manages security alerts across all XAOSTECH repositories
+# Contains GitHub App credentials and sensitive security logic
+
+name = "xaostech-security"
+main = "src/index.ts"
+compatibility_date = "2025-01-20"
+
+# Run security scan every 6 hours
+[triggers]
+crons = ["0 */6 * * *"]
+
+[vars]
+GITHUB_ORG = "XAOSTECH"
+BOT_NAME = "xaostech-security[bot]"
+
+# Production environment
+[env.production]
+name = "xaostech-security"
+
+# D1 Database for alert tracking
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "security-alerts"
+database_id = "placeholder-create-via-wrangler"
+
+# KV for caching and state
+[[env.production.kv_namespaces]]
+binding = "CACHE"
+id = "placeholder-create-via-wrangler"
+
+# Secrets (set via wrangler secret put):
+# - GITHUB_APP_ID: GitHub App ID
+# - GITHUB_APP_PRIVATE_KEY: GitHub App private key (PEM format)
+# - GITHUB_WEBHOOK_SECRET: Webhook signature verification
+# - ADMIN_API_KEY: Internal admin access key
+
+# GitHub App Installation ID per repo (or org-wide)
+# - GITHUB_INSTALLATION_ID: Installation ID for XAOSTECH org

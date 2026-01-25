@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Wrangler
+.wrangler/
+.dev.vars
+
+# Secrets - NEVER COMMIT THESE
+*.pem
+*.key
+private-key.json
+secrets.json
+
+# Environment files with secrets
+.env
+.env.*
+!.env.example
+
+# Build outputs
+dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

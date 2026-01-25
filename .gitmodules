@@ -2,6 +2,10 @@
 	path = account.xaostech.io
 	url = https://github.com/XAOSTECH/account.xaostech.io.git
 
+[submodule "ai.xaostech.io"]
+	path = ai.xaostech.io
+	url = https://github.com/XAOSTECH/ai.xaostech.io.git
+
 [submodule "api.xaostech.io"]
 	path = api.xaostech.io
 	url = https://github.com/XAOSTECH/api.xaostech.io.git
