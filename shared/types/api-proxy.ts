@@ -72,16 +72,7 @@ export const createProxyHandler = (): APIRoute => {
 
       console.log('[api-proxy] Response status:', response.status, 'type:', response.type);
 
-      // For redirects, use Response.redirect() to properly send 302 to browser
-      if (response.status >= 300 && response.status < 400) {
-        const location = response.headers.get('Location');
-        if (location) {
-          console.log('[api-proxy] Redirect to:', location);
-          return Response.redirect(location, response.status);
-        }
-      }
-
-      // Return the response with appropriate headers
+      // Return the response with all headers (including Set-Cookie for redirects)
       return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,
