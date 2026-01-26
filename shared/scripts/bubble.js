@@ -350,7 +350,7 @@
       <div class="xb-collapse" title="Minimize">×</div>
       
       <div class="xb-main">
-        <img class="xb-avatar" src="${user?.avatar_url || 'https://data.xaostech.io/api/assets/XAOSTECH_LOGO.png'}" alt="User" />
+        <img class="xb-avatar" src="${user?.avatar_url || '/api/data/assets/XAOSTECH_LOGO.png'}" alt="User" />
         <div class="xb-status ${user ? '' : 'offline'}"></div>
         <div class="xb-badge hidden" id="xb-notif-badge">0</div>
       </div>
@@ -358,7 +358,7 @@
       <div class="xb-panel">
         ${user ? `
           <div class="xb-user">
-            <img class="xb-user-avatar" src="${user.avatar_url || 'https://data.xaostech.io/api/assets/XAOSTECH_LOGO.png'}" alt="${user.username}" />
+            <img class="xb-user-avatar" src="${user.avatar_url || '/api/data/assets/XAOSTECH_LOGO.png'}" alt="${user.username}" />
             <div class="xb-user-info">
               <div class="xb-user-name">${user.username}</div>
               <div class="xb-user-role">${user.role || 'user'}</div>
