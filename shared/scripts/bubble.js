@@ -13,81 +13,81 @@
  * State preserved across page loads and subdomain navigation via localStorage.
  */
 
-(function() {
-  'use strict';
+(function () {
+    'use strict';
 
-  const STORAGE_KEY = 'xaostech_bubble';
-  const THEME_KEY = 'xaostech_theme';
-  
-  // Default state
-  const defaultState = {
-    x: window.innerWidth - 80,
-    y: window.innerHeight - 80,
-    collapsed: false,
-    expanded: false
-  };
+    const STORAGE_KEY = 'xaostech_bubble';
+    const THEME_KEY = 'xaostech_theme';
 
-  // Load state from localStorage
-  function loadState() {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? { ...defaultState, ...JSON.parse(saved) } : defaultState;
-    } catch {
-      return defaultState;
+    // Default state
+    const defaultState = {
+        x: window.innerWidth - 80,
+        y: window.innerHeight - 80,
+        collapsed: false,
+        expanded: false
+    };
+
+    // Load state from localStorage
+    function loadState() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            return saved ? { ...defaultState, ...JSON.parse(saved) } : defaultState;
+        } catch {
+            return defaultState;
+        }
     }
-  }
 
-  // Save state to localStorage
-  function saveState(state) {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (e) {
-      console.warn('Could not save bubble state:', e);
+    // Save state to localStorage
+    function saveState(state) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+            console.warn('Could not save bubble state:', e);
+        }
     }
-  }
 
-  // Get current theme
-  function getTheme() {
-    return localStorage.getItem(THEME_KEY) || 'dark';
-  }
-
-  // Set theme
-  function setTheme(theme) {
-    localStorage.setItem(THEME_KEY, theme);
-    document.documentElement.setAttribute('data-theme', theme);
-    document.body.classList.toggle('light-theme', theme === 'light');
-  }
-
-  // Parse session cookie
-  function getSessionId() {
-    const match = document.cookie.match(/session_id=([^;]+)/);
-    return match ? match[1] : null;
-  }
-
-  // Fetch user data from account API
-  async function fetchUser() {
-    const sessionId = getSessionId();
-    if (!sessionId) return null;
-    
-    try {
-      const res = await fetch('https://account.xaostech.io/api/auth/me', {
-        credentials: 'include'
-      });
-      if (res.ok) return await res.json();
-    } catch (e) {
-      console.warn('Could not fetch user:', e);
+    // Get current theme
+    function getTheme() {
+        return localStorage.getItem(THEME_KEY) || 'dark';
     }
-    return null;
-  }
 
-  // Create the bubble UI
-  function createBubble(user, state) {
-    // Remove existing bubble if any
-    document.getElementById('xaos-bubble')?.remove();
+    // Set theme
+    function setTheme(theme) {
+        localStorage.setItem(THEME_KEY, theme);
+        document.documentElement.setAttribute('data-theme', theme);
+        document.body.classList.toggle('light-theme', theme === 'light');
+    }
 
-    const bubble = document.createElement('div');
-    bubble.id = 'xaos-bubble';
-    bubble.innerHTML = `
+    // Parse session cookie
+    function getSessionId() {
+        const match = document.cookie.match(/session_id=([^;]+)/);
+        return match ? match[1] : null;
+    }
+
+    // Fetch user data from account API
+    async function fetchUser() {
+        const sessionId = getSessionId();
+        if (!sessionId) return null;
+
+        try {
+            const res = await fetch('https://account.xaostech.io/api/auth/me', {
+                credentials: 'include'
+            });
+            if (res.ok) return await res.json();
+        } catch (e) {
+            console.warn('Could not fetch user:', e);
+        }
+        return null;
+    }
+
+    // Create the bubble UI
+    function createBubble(user, state) {
+        // Remove existing bubble if any
+        document.getElementById('xaos-bubble')?.remove();
+
+        const bubble = document.createElement('div');
+        bubble.id = 'xaos-bubble';
+        bubble.innerHTML = `
       <style>
         #xaos-bubble {
           position: fixed;
@@ -396,162 +396,162 @@
       </div>
     `;
 
-    // Set initial position
-    bubble.style.left = state.x + 'px';
-    bubble.style.top = state.y + 'px';
+        // Set initial position
+        bubble.style.left = state.x + 'px';
+        bubble.style.top = state.y + 'px';
 
-    if (state.collapsed) {
-      bubble.classList.add('xb-collapsed');
+        if (state.collapsed) {
+            bubble.classList.add('xb-collapsed');
+        }
+
+        document.body.appendChild(bubble);
+
+        // Setup interactions
+        setupDrag(bubble, state);
+        setupToggle(bubble, state);
+        setupTheme(bubble);
+
+        return bubble;
     }
 
-    document.body.appendChild(bubble);
-    
-    // Setup interactions
-    setupDrag(bubble, state);
-    setupToggle(bubble, state);
-    setupTheme(bubble);
-    
-    return bubble;
-  }
+    function isCurrentDomain(domain) {
+        return window.location.hostname === domain ||
+            window.location.hostname === 'www.' + domain;
+    }
 
-  function isCurrentDomain(domain) {
-    return window.location.hostname === domain || 
-           window.location.hostname === 'www.' + domain;
-  }
+    // Dragging functionality
+    function setupDrag(bubble, state) {
+        const main = bubble.querySelector('.xb-main');
+        let isDragging = false;
+        let startX, startY, startLeft, startTop;
 
-  // Dragging functionality
-  function setupDrag(bubble, state) {
-    const main = bubble.querySelector('.xb-main');
-    let isDragging = false;
-    let startX, startY, startLeft, startTop;
+        main.addEventListener('pointerdown', (e) => {
+            if (e.target.closest('.xb-collapse')) return;
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startLeft = bubble.offsetLeft;
+            startTop = bubble.offsetTop;
+            main.setPointerCapture(e.pointerId);
+            e.preventDefault();
+        });
 
-    main.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('.xb-collapse')) return;
-      isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      startLeft = bubble.offsetLeft;
-      startTop = bubble.offsetTop;
-      main.setPointerCapture(e.pointerId);
-      e.preventDefault();
-    });
+        main.addEventListener('pointermove', (e) => {
+            if (!isDragging) return;
 
-    main.addEventListener('pointermove', (e) => {
-      if (!isDragging) return;
-      
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-      
-      let newX = startLeft + dx;
-      let newY = startTop + dy;
-      
-      // Constrain to viewport
-      newX = Math.max(0, Math.min(window.innerWidth - 60, newX));
-      newY = Math.max(0, Math.min(window.innerHeight - 60, newY));
-      
-      bubble.style.left = newX + 'px';
-      bubble.style.top = newY + 'px';
-      
-      state.x = newX;
-      state.y = newY;
-    });
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
 
-    main.addEventListener('pointerup', (e) => {
-      if (!isDragging) return;
-      isDragging = false;
-      main.releasePointerCapture(e.pointerId);
-      
-      // Only toggle panel if it was a click (not drag)
-      const dx = Math.abs(e.clientX - startX);
-      const dy = Math.abs(e.clientY - startY);
-      
-      if (dx < 5 && dy < 5) {
-        togglePanel(bubble, state);
-      }
-      
-      saveState(state);
-    });
-  }
+            let newX = startLeft + dx;
+            let newY = startTop + dy;
 
-  // Panel toggle
-  function togglePanel(bubble, state) {
-    const panel = bubble.querySelector('.xb-panel');
-    state.expanded = !state.expanded;
-    panel.classList.toggle('visible', state.expanded);
-    saveState(state);
-  }
+            // Constrain to viewport
+            newX = Math.max(0, Math.min(window.innerWidth - 60, newX));
+            newY = Math.max(0, Math.min(window.innerHeight - 60, newY));
 
-  // Collapse toggle
-  function setupToggle(bubble, state) {
-    const collapse = bubble.querySelector('.xb-collapse');
-    collapse.addEventListener('click', (e) => {
-      e.stopPropagation();
-      state.collapsed = !state.collapsed;
-      bubble.classList.toggle('xb-collapsed', state.collapsed);
-      saveState(state);
-    });
-  }
+            bubble.style.left = newX + 'px';
+            bubble.style.top = newY + 'px';
 
-  // Theme toggle
-  function setupTheme(bubble) {
-    const btn = bubble.querySelector('#xb-theme-toggle');
-    if (!btn) return;
-    
-    btn.addEventListener('click', () => {
-      const newTheme = getTheme() === 'dark' ? 'light' : 'dark';
-      setTheme(newTheme);
-      
-      const icon = bubble.querySelector('#xb-theme-icon');
-      const label = btn.querySelector('span:last-child');
-      icon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-      label.textContent = newTheme === 'dark' ? 'Light' : 'Dark';
-    });
-  }
+            state.x = newX;
+            state.y = newY;
+        });
 
-  // Close panel when clicking outside
-  document.addEventListener('click', (e) => {
-    const bubble = document.getElementById('xaos-bubble');
-    if (!bubble) return;
-    
-    if (!bubble.contains(e.target)) {
-      const panel = bubble.querySelector('.xb-panel');
-      const state = loadState();
-      if (state.expanded) {
-        state.expanded = false;
-        panel.classList.remove('visible');
+        main.addEventListener('pointerup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            main.releasePointerCapture(e.pointerId);
+
+            // Only toggle panel if it was a click (not drag)
+            const dx = Math.abs(e.clientX - startX);
+            const dy = Math.abs(e.clientY - startY);
+
+            if (dx < 5 && dy < 5) {
+                togglePanel(bubble, state);
+            }
+
+            saveState(state);
+        });
+    }
+
+    // Panel toggle
+    function togglePanel(bubble, state) {
+        const panel = bubble.querySelector('.xb-panel');
+        state.expanded = !state.expanded;
+        panel.classList.toggle('visible', state.expanded);
         saveState(state);
-      }
     }
-  });
 
-  // Initialize
-  async function init() {
-    // Apply saved theme immediately
-    setTheme(getTheme());
-    
-    const state = loadState();
-    const user = await fetchUser();
-    createBubble(user, state);
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-      const bubble = document.getElementById('xaos-bubble');
-      if (!bubble) return;
-      
-      const state = loadState();
-      // Keep bubble in viewport
-      state.x = Math.min(state.x, window.innerWidth - 60);
-      state.y = Math.min(state.y, window.innerHeight - 60);
-      bubble.style.left = state.x + 'px';
-      bubble.style.top = state.y + 'px';
-      saveState(state);
+    // Collapse toggle
+    function setupToggle(bubble, state) {
+        const collapse = bubble.querySelector('.xb-collapse');
+        collapse.addEventListener('click', (e) => {
+            e.stopPropagation();
+            state.collapsed = !state.collapsed;
+            bubble.classList.toggle('xb-collapsed', state.collapsed);
+            saveState(state);
+        });
+    }
+
+    // Theme toggle
+    function setupTheme(bubble) {
+        const btn = bubble.querySelector('#xb-theme-toggle');
+        if (!btn) return;
+
+        btn.addEventListener('click', () => {
+            const newTheme = getTheme() === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+
+            const icon = bubble.querySelector('#xb-theme-icon');
+            const label = btn.querySelector('span:last-child');
+            icon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            label.textContent = newTheme === 'dark' ? 'Light' : 'Dark';
+        });
+    }
+
+    // Close panel when clicking outside
+    document.addEventListener('click', (e) => {
+        const bubble = document.getElementById('xaos-bubble');
+        if (!bubble) return;
+
+        if (!bubble.contains(e.target)) {
+            const panel = bubble.querySelector('.xb-panel');
+            const state = loadState();
+            if (state.expanded) {
+                state.expanded = false;
+                panel.classList.remove('visible');
+                saveState(state);
+            }
+        }
     });
-  }
 
-  // Start when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+    // Initialize
+    async function init() {
+        // Apply saved theme immediately
+        setTheme(getTheme());
+
+        const state = loadState();
+        const user = await fetchUser();
+        createBubble(user, state);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const bubble = document.getElementById('xaos-bubble');
+            if (!bubble) return;
+
+            const state = loadState();
+            // Keep bubble in viewport
+            state.x = Math.min(state.x, window.innerWidth - 60);
+            state.y = Math.min(state.y, window.innerHeight - 60);
+            bubble.style.left = state.x + 'px';
+            bubble.style.top = state.y + 'px';
+            saveState(state);
+        });
+    }
+
+    // Start when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();
