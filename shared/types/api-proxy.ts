@@ -56,7 +56,7 @@ export const createProxyHandler = (): APIRoute => {
         console.warn('[api-proxy] Missing API_ACCESS_CLIENT_ID/SECRET; forwarding without auth', { traceId });
       }
 
-      // Proxy the request
+      // Proxy the request - redirect: 'manual' passes 302s through for OAuth
       const proxiedRequest = new Request(proxiedUrl, {
         method: request.method,
         headers,
@@ -64,6 +64,7 @@ export const createProxyHandler = (): APIRoute => {
           request.method !== 'GET' && request.method !== 'HEAD'
             ? await request.text()
             : undefined,
+        redirect: 'manual',
       });
 
       console.log('[api-proxy] Fetching from:', proxiedUrl.toString());
