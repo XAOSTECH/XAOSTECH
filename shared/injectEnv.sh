@@ -36,6 +36,8 @@ if [ -f "astro.config.mjs" ]; then
   echo "Syncing shared pages and routes for Astro workers"
     mkdir -p "src/pages/api"
     mv "shared/pages/api/[...path].ts" "src/pages/api/"
-    mv "shared/pages/favicon.ico.ts" "src/pages/" 
+    mv "shared/pages/favicon.ico.ts" "src/pages/"
+    # Copy bubble script to public for Astro workers
+    mkdir -p "public" && cp "shared/scripts/bubble.js" "public/"
 fi
 rm -r "shared/pages"
