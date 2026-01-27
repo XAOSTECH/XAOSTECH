@@ -1,8 +1,0 @@
-blank_issues_enabled: true
-contact_links:
-  - name: 💬 Discussions
-    url: https://github.com/xaoscience/security.xaostech.io/discussions
-    about: Ask questions and discuss ideas
-  - name: 📖 Documentation
-    url: https://github.com/xaoscience/security.xaostech.io#readme
-    about: Read the documentation

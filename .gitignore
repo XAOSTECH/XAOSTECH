@@ -30,3 +30,6 @@ build/
 *.log
 logs/
 package-lock.json
+
+# Submodule
+security.xaostech.io
