@@ -48,13 +48,10 @@ function removeUntilStable(input: string, remover: (s: string) => string): strin
 export function sanitiseHtml(input: string): string {
     if (!input) return '';
 
+    // Use only character-level filtering to remove all angle brackets,
+    // preventing any HTML tags or malformed tag fragments from surviving.
     return removeUntilStable(input, (s) => {
-        // First pass: remove well-formed tags
-        let result = s.replace(/<[^>]*>/g, '');
-        // Second pass: remove any remaining angle brackets (malformed tags)
-        // Use character filter to avoid multi-char sanitization warning
-        result = [...result].filter(c => c !== '<' && c !== '>').join('');
-        return result;
+        return [...s].filter(c => c !== '<' && c !== '>').join('');
     });
 }
 
