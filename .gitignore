@@ -4,7 +4,6 @@ Thumbs.db
 
 # IDE/Editor folders
 .idea/
-.vscode/
 *.swp
 *.swo
 
@@ -20,7 +19,6 @@ build/
 *.egg-info/
 
 # Environment
-.devcontainer
 .env
 .env.local
 *.env

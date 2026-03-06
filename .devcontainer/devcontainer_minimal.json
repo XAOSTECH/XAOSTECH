@@ -1,0 +1,31 @@
+{
+  "name": "XAOSTECH",
+  "image": "devcontrol/web-dev:latest",
+  "remoteUser": "web-dev",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/XAOSTECH,type=bind,consistency=cached",
+  "workspaceFolder": "/workspaces/XAOSTECH",
+  
+  "mounts": [
+    "source=/run/user/1000/podman/podman.sock,target=/var/run/docker.sock,type=bind"
+  ],
+  "containerEnv": {
+    "GPG_KEY_ID": "",
+    "GITHUB_USER": "",
+    "DOCKER_HOST": "unix:///var/run/docker.sock",
+    "DISPLAY": "${localEnv:DISPLAY}",
+    "TZ": ""
+  },
+  "postCreateCommand": "sudo chown -R 1000:1000 . 2>/dev/null || true && sudo chmod 755 /home/web-dev 2>/dev/null || true && sudo chown -R 1000:1000 /home/web-dev/.vscode-server 2>/dev/null || true && sudo mkdir -p /home/web-dev/.gnupg /home/web-dev/.ssh /home/web-dev/.cache /home/web-dev/.config && sudo chown 1000:1000 /home/web-dev/.gnupg /home/web-dev/.ssh /home/web-dev/.cache /home/web-dev/.config && sudo chmod 700 /home/web-dev/.gnupg /home/web-dev/.ssh && sudo chmod 755 /home/web-dev/.cache /home/web-dev/.config && sudo mkdir -p /run/user/1000/gnupg && sudo chown -R 1000:1000 /run/user/1000 2>/dev/null || true && ln -sf /tmp/wayland-0 /run/user/1000/wayland-0 2>/dev/null || true && git config --global --add safe.directory '*' && git config --global init.defaultBranch main && bash -c 'bash /opt/dev-control/scripts/alias-loading.sh <<< A'",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.cwd": "/workspaces/XAOSTECH",
+        "git.enableSmartCommit": true,
+        "git.autofetch": true
+      },
+      "extensions": [
+        "github.copilot","github.copilot-chat","dbaeumer.vscode-eslint","esbenp.prettier-vscode"
+      ]
+    }
+  }
+}
