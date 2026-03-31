@@ -30,6 +30,10 @@
 	path = lingua.xaostech.io
 	url = https://github.com/XAOSTECH/lingua.xaostech.io.git
 
+[submodule "music.xaostech.io"]
+	path = music.xaostech.io
+	url = https://github.com/XAOSTECH/music.xaostech.io.git
+
 [submodule "payments.xaostech.io"]
 	path = payments.xaostech.io
 	url = https://github.com/XAOSTECH/payments.xaostech.io.git
