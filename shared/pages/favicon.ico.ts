@@ -1,3 +1,4 @@
+export const prerender = false;
 import { createProxyHandler } from '../../shared/types/api-proxy';
 
 const proxy = createProxyHandler();

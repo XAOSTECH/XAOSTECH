@@ -15,17 +15,24 @@ export function getSecurityHeaders() {
   } as Record<string, string>;
 }
 
-export function applySecurityHeaders(response: Response) {
-  const headers = new Headers(response.headers || {});
+export function applySecurityHeaders(response: Response): Response {
   const sec = getSecurityHeaders();
-  for (const k of Object.keys(sec)) {
-    headers.set(k, sec[k]);
+  try {
+    // Prefer in-place mutation (works in Cloudflare Workers / Astro middleware)
+    for (const k of Object.keys(sec)) {
+      response.headers.set(k, sec[k]);
+    }
+    return response;
+  } catch {
+    // Fallback: clone into a new Response if headers are immutable
+    const headers = new Headers(response.headers);
+    for (const k of Object.keys(sec)) {
+      headers.set(k, sec[k]);
+    }
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
   }
-
-  // Some Responses may be a plain object, ensure we return a Response
-  return new Response(response.body, {
-    status: (response as any).status || 200,
-    statusText: (response as any).statusText || undefined,
-    headers,
-  });
 }
