@@ -4,7 +4,7 @@
 
 All API logic (except proprietary payment logic) is centralized in the **API worker**, which is protected by Cloudflare Access Policy. This enables:
 - **Future public API access** for automation and building
-- **Programmatic account creation** for authorized users
+- **Programmatic account creation** for authorised users
 - **Security** by keeping secrets behind access policy
 - **Cleaner separation of concerns** - each worker has one responsibility
 
@@ -49,7 +49,7 @@ Other workers (chat, blog, etc.)
 2. account.xaostech.io links to /api/auth/github/login
 3. API worker (protected) starts OAuth:
    - Generates state token
-   - Redirects to GitHub authorization
+   - Redirects to GitHub authorisation
    - Sets gh_oauth_state cookie
 4. User grants permission on GitHub.com
 5. GitHub redirects to /api/auth/github/callback with code
@@ -152,7 +152,7 @@ GET /api/accounts?role=admin (restricted by access policy)
 POST /api/accounts { email, name } (restricted to trusted partners)
 
 // OAuth for third-party apps (future)
-POST /api/auth/oauth/authorize (delegate auth to XAOSTECH)
+POST /api/auth/oauth/authorise (delegate auth to XAOSTECH)
 ```
 
 All of these can be implemented in the API worker without touching other workers.
