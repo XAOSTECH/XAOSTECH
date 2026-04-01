@@ -23,6 +23,8 @@ build/
 .env.local
 *.env
 .tmp
+.wrangler
+!.wrangler/namespaces.json
 
 # Logs
 *.log
