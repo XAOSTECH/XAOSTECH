@@ -58,17 +58,8 @@
     document.body.classList.toggle('light-theme', theme === 'light');
   }
 
-  // Parse session cookie
-  function getSessionId() {
-    const match = document.cookie.match(/session_id=([^;]+)/);
-    return match ? match[1] : null;
-  }
-
-  // Fetch user data from account API
+  // Fetch user data from account API (cookie is HttpOnly, sent automatically via credentials: 'include')
   async function fetchUser() {
-    const sessionId = getSessionId();
-    if (!sessionId) return null;
-
     try {
       const res = await fetch('https://account.xaostech.io/api/auth/me', {
         credentials: 'include'
