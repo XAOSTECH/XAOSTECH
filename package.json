@@ -8,6 +8,7 @@
     "deploy:all": "npm --prefix api.xaostech.io run deploy && npm --prefix account.xaostech.io run deploy && npm --prefix blog.xaostech.io run deploy && npm --prefix data.xaostech.io run deploy && npm --prefix lingua.xaostech.io run deploy && npm --prefix chat.xaostech.io run deploy && npm --prefix payments.xaostech.io run deploy && npm --prefix music.xaostech.io run deploy && npm --prefix ai.xaostech.io run deploy && npm --prefix edu.xaostech.io run deploy && npm --prefix security.xaostech.io run deploy && npm --prefix portfolio.xaostech.io run deploy && npm --prefix xaostech.io run deploy"
   },
   "devDependencies": {
-    "concurrently": "latest"
+    "concurrently": "latest",
+    "wrangler": "^4.79.0"
   }
 }
