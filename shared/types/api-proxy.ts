@@ -5,6 +5,9 @@
 
 import type { APIRoute } from 'astro';
 import type { ProxyEnv } from './env';
+// Astro v6 removed Astro.locals.runtime.env. Bindings/secrets must be
+// imported from the workerd virtual module.
+import { env } from 'cloudflare:workers';
 
 export const createProxyHandler = (): APIRoute => {
   return async (context) => {
@@ -17,11 +20,8 @@ export const createProxyHandler = (): APIRoute => {
     try {
       console.log('[api-proxy] Proxying request to api.xaostech.io:', pathname);
 
-      // Access runtime secrets from Cloudflare adapter context
-      // In @astrojs/cloudflare, secrets are available at locals.runtime.env
-      const env = (locals as any).runtime?.env || {};
-      const clientId = env.API_ACCESS_CLIENT_ID;
-      const clientSecret = env.API_ACCESS_CLIENT_SECRET;
+      const clientId = (env as any).API_ACCESS_CLIENT_ID;
+      const clientSecret = (env as any).API_ACCESS_CLIENT_SECRET;
 
 
       // Build proxied URL
