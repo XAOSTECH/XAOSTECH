@@ -1,6 +1,20 @@
 # XAOSTECH Architecture: Unified API-Centric OAuth
 
-## Philosophy
+> **STATUS — Migration in progress (away from this design):** The Hono `api.xaostech.io`
+> worker is being decomposed back into the per-domain Astro workers. As of the
+> last commit on `main`, GitHub OAuth (`/api/auth/github/login` and
+> `/api/auth/github/callback`) is owned by `account.xaostech.io`, not the api
+> worker. The api worker's `/auth/github/*` routes are now dead code. The rest
+> of this document describes the legacy intent; treat anything below conflicting
+> with `account.xaostech.io/src/pages/api/auth/` as out-of-date.
+>
+> **GitHub OAuth callback URL registered with GitHub:**
+> `https://account.xaostech.io/api/auth/github/callback`
+> (the `https://api.xaostech.io/auth/github/callback` shown later in this file
+> was never the actual registered URL — the api worker's code redirected to the
+> account URL, which is what GitHub validated against).
+
+## Philosophy (legacy intent — see status banner above)
 
 All API logic (except proprietary payment logic) is centralized in the **API worker**, which is protected by Cloudflare Access Policy. This enables:
 - **Future public API access** for automation and building
@@ -133,7 +147,7 @@ wrangler deploy --env production
    - **Application name**: `XAOSTECH Account`
    - **Homepage URL**: `https://account.xaostech.io`
    - **Application description**: `User authentication for XAOSTECH`
-   - **Authorization callback URL**: `https://api.xaostech.io/auth/github/callback`
+   - **Authorization callback URL**: `https://account.xaostech.io/api/auth/github/callback`
 4. Copy **Client ID** and generate **Client Secret**
 5. Run commands above to store secrets
 
