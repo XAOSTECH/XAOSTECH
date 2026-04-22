@@ -1,20 +1,16 @@
 # XAOSTECH Architecture: Unified API-Centric OAuth
 
-> **STATUS — Migration in progress (away from this design):** The Hono `api.xaostech.io`
-> worker is being decomposed back into the per-domain Astro workers. As of the
-> last commit on `main`, GitHub OAuth (`/api/auth/github/login` and
-> `/api/auth/github/callback`) is owned by `account.xaostech.io`, not the api
-> worker. The api worker's `/auth/github/*` routes are now dead code. The rest
-> of this document describes the legacy intent; treat anything below conflicting
-> with `account.xaostech.io/src/pages/api/auth/` as out-of-date.
->
-> **GitHub OAuth callback URL registered with GitHub:**
-> `https://account.xaostech.io/api/auth/github/callback`
-> (the `https://api.xaostech.io/auth/github/callback` shown later in this file
-> was never the actual registered URL — the api worker's code redirected to the
-> account URL, which is what GitHub validated against).
+> **Note on `account.xaostech.io/api/auth/github/{login,callback}`:**
+> These two routes on the account worker are **thin 302 proxies** to
+> `api.xaostech.io/auth/github/{login,callback}`. They exist because the
+> GitHub OAuth App has the public-facing callback URL registered as
+> `https://account.xaostech.io/api/auth/github/callback` (account is the
+> public face). The actual code exchange, user upsert, and session creation
+> happen on the **gated** api worker, which is the only place that holds
+> `GITHUB_OAUTH_CLIENT_ID` / `GITHUB_OAUTH_CLIENT_SECRET`. Session/state
+> cookies are scoped to `Domain=.xaostech.io`, so both subdomains see them.
 
-## Philosophy (legacy intent — see status banner above)
+## Philosophy
 
 All API logic (except proprietary payment logic) is centralized in the **API worker**, which is protected by Cloudflare Access Policy. This enables:
 - **Future public API access** for automation and building
