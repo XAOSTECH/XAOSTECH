@@ -2,6 +2,11 @@
 # Inject build environment variables into wrangler.toml at build time
 # Add Astro-compatible API proxy path for Astro workers
 set -e
+
+# Disable Astro telemetry for every CF Pages build (no persistent home dir,
+# so `astro telemetry disable` would not stick between builds).
+export ASTRO_TELEMETRY_DISABLED=1
+
 echo "Injecting environment variables..."
 sed -i "s/\${KV_SESSIONS_ID}/${KV_SESSIONS_ID}/g" "wrangler.toml"
 sed -i "s/\${KV_MESSAGES_ID}/${KV_MESSAGES_ID}/g" "wrangler.toml"
