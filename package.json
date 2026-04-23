@@ -9,6 +9,6 @@
   },
   "devDependencies": {
     "concurrently": "latest",
-    "wrangler": "^4.79.0"
+    "wrangler": "latest"
   }
 }
