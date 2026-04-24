@@ -181,6 +181,16 @@ const { items, title = 'Menu', subtitle = 'Welcome' } = Astro.props;
     min-height: 100vh;
     overflow: hidden;
     background: linear-gradient(135deg, #0a0a14 0%, #1a0a2e 100%);
+    /* Light-theme reuse: invert + hue-rotate flips the dark gradient AND the
+       canvas drawing in one shot, no JS color recomputation. The menu overlay
+       re-inverts itself below so text/links keep their intended colors. */
+    transition: filter .35s ease;
+  }
+  body.light-theme .animated-menu-container {
+    filter: invert(1) hue-rotate(180deg);
+  }
+  body.light-theme .animated-menu-container .menu-overlay {
+    filter: invert(1) hue-rotate(180deg);
   }
 
   #particle-canvas {
