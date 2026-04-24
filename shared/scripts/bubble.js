@@ -180,6 +180,34 @@
           visibility: visible;
           transform: translateY(0) scale(1);
         }
+
+        /* Sub-panels (scaffold for messages + progress) */
+        .xb-sub {
+          position: absolute;
+          bottom: 0;
+          right: 260px;
+          width: 280px;
+          max-height: 360px;
+          background: #1a1a2e;
+          border: 1px solid #00d4ff33;
+          border-radius: 12px;
+          padding: .75rem;
+          box-shadow: 0 8px 32px rgba(0,0,0,.4);
+          display: flex;
+          flex-direction: column;
+        }
+        .xb-sub[hidden] { display: none; }
+        .xb-sub-h { display:flex;justify-content:space-between;align-items:center;font-weight:600;padding-bottom:.5rem;border-bottom:1px solid #ffffff15;margin-bottom:.5rem;color:#00d4ff }
+        .xb-sub-x { background:none;border:0;color:#aaa;cursor:pointer;font-size:1.2rem;line-height:1 }
+        .xb-sub-body { flex:1;overflow:auto;font-size:.9rem;color:#ddd }
+        .xb-sub-foot { padding-top:.5rem;border-top:1px solid #ffffff15;margin-top:.5rem;text-align:center }
+        .xb-empty { opacity:.5;text-align:center;padding:1.5rem .5rem;font-size:.85rem }
+        .xb-conv { display:flex;align-items:center;gap:.5rem;padding:.5rem;border-radius:6px;cursor:pointer }
+        .xb-conv:hover { background:#ffffff10 }
+        .xb-conv .who { flex:1;font-weight:600 }
+        .xb-conv .when { font-size:.7rem;opacity:.5 }
+        .xb-prog-bar { background:#ffffff15;border-radius:99px;height:8px;overflow:hidden;margin:.5rem 0 }
+        .xb-prog-fill { background:linear-gradient(90deg,#00d4ff,#43a047);height:100%;transition:width .3s }
         
         .xb-user {
           display: flex;
@@ -373,7 +401,31 @@
             <button class="xb-btn" id="xb-notif-btn" title="Notifications">
               🔔 <span id="xb-notif-count">0</span>
             </button>
+            <button class="xb-btn" id="xb-msg-btn" title="Messages">
+              ✉️ <span id="xb-msg-count">0</span>
+            </button>
+            <button class="xb-btn" id="xb-prog-btn" title="Learning progress">
+              📈 <span id="xb-prog-pct">—</span>
+            </button>
           ` : ''}
+        </div>
+
+        <!-- Sub-panel: Messages (scaffold) -->
+        <div class="xb-sub xb-sub-msg" id="xb-sub-msg" hidden>
+          <div class="xb-sub-h"><span>Messages</span><button class="xb-sub-x" data-close="msg">×</button></div>
+          <div class="xb-sub-body" id="xb-msg-list">
+            <div class="xb-empty">No conversations yet.</div>
+          </div>
+          <div class="xb-sub-foot"><small style="opacity:.5">DM scaffold — wired to api.xaostech.io/messages</small></div>
+        </div>
+
+        <!-- Sub-panel: Progress (scaffold) -->
+        <div class="xb-sub xb-sub-prog" id="xb-sub-prog" hidden>
+          <div class="xb-sub-h"><span>Learning progress</span><button class="xb-sub-x" data-close="prog">×</button></div>
+          <div class="xb-sub-body" id="xb-prog-body">
+            <div class="xb-empty">No active course.</div>
+          </div>
+          <div class="xb-sub-foot"><a href="https://edu.xaostech.io/courses" style="color:#00d4ff;font-size:.85rem">Browse courses →</a></div>
         </div>
         
         <nav class="xb-nav">
@@ -401,8 +453,96 @@
     setupDrag(bubble, state);
     setupToggle(bubble, state);
     setupTheme(bubble);
+    setupSubPanels(bubble, user);
 
     return bubble;
+  }
+
+  // Sub-panel wiring (messages + progress) — scaffold
+  function setupSubPanels(bubble, user) {
+    if (!user) return;
+    const API = 'https://api.xaostech.io';
+    const EDU = 'https://edu.xaostech.io';
+
+    const subMsg  = bubble.querySelector('#xb-sub-msg');
+    const subProg = bubble.querySelector('#xb-sub-prog');
+
+    function closeAll() { subMsg.hidden = true; subProg.hidden = true; }
+    function open(panel) { closeAll(); panel.hidden = false; }
+
+    bubble.querySelectorAll('.xb-sub-x').forEach((x) => {
+      x.addEventListener('click', (e) => { e.stopPropagation(); closeAll(); });
+    });
+
+    const msgBtn = bubble.querySelector('#xb-msg-btn');
+    if (msgBtn) {
+      msgBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!subMsg.hidden) { closeAll(); return; }
+        open(subMsg);
+        await loadInbox();
+      });
+    }
+
+    const progBtn = bubble.querySelector('#xb-prog-btn');
+    if (progBtn) {
+      progBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (!subProg.hidden) { closeAll(); return; }
+        open(subProg);
+        await loadProgress();
+      });
+    }
+
+    async function loadInbox() {
+      const list = bubble.querySelector('#xb-msg-list');
+      list.innerHTML = '<div class="xb-empty">Loading…</div>';
+      try {
+        const r = await fetch(API + '/messages/inbox', { credentials: 'include' });
+        const data = await r.json();
+        const conv = data.conversations || [];
+        const cnt = bubble.querySelector('#xb-msg-count');
+        if (cnt) cnt.textContent = data.unread || 0;
+        if (!conv.length) { list.innerHTML = '<div class="xb-empty">No conversations yet.</div>'; return; }
+        list.innerHTML = conv.map((c) => `
+          <div class="xb-conv" data-peer="${c.peer?.id || ''}">
+            <div class="who">${c.peer?.username || 'Unknown'}</div>
+            <div class="when">${c.lastMessageAt ? new Date(c.lastMessageAt).toLocaleDateString() : ''}</div>
+          </div>
+        `).join('');
+        // TODO: click handler → load thread (GET /messages/thread/:peerId), render messages, send box
+      } catch (err) {
+        list.innerHTML = '<div class="xb-empty">Failed to load.</div>';
+      }
+    }
+
+    async function loadProgress() {
+      const body = bubble.querySelector('#xb-prog-body');
+      body.innerHTML = '<div class="xb-empty">Loading…</div>';
+      try {
+        // Determine active course: from edu summary, or from current page if on edu
+        const sumR = await fetch(EDU + '/api/progress/_summary', { credentials: 'include' });
+        const summary = sumR.ok ? await sumR.json() : { activeCourseId: null };
+        const courseId = summary.activeCourseId
+          || (location.hostname === 'edu.xaostech.io' && (location.pathname.match(/\/courses\/([^/]+)/) || [])[1]);
+        if (!courseId) { body.innerHTML = '<div class="xb-empty">No active course. Browse courses below.</div>'; return; }
+        const r = await fetch(EDU + '/api/progress/' + courseId, { credentials: 'include' });
+        const p = await r.json();
+        const pct = bubble.querySelector('#xb-prog-pct');
+        if (pct) pct.textContent = (p.percent || 0) + '%';
+        body.innerHTML = `
+          <div style="font-weight:600;margin-bottom:.25rem">${p.courseId}</div>
+          <div class="xb-prog-bar"><div class="xb-prog-fill" style="width:${p.percent || 0}%"></div></div>
+          <div style="font-size:.8rem;opacity:.7">Chapter ${(p.currentChapter || 0) + 1} · ${p.xp || 0} XP</div>
+        `;
+      } catch (err) {
+        body.innerHTML = '<div class="xb-empty">Failed to load.</div>';
+      }
+    }
+
+    // Initial badge polling (lightweight: one fetch per panel mount)
+    loadInbox().catch(() => {});
+    loadProgress().catch(() => {});
   }
 
   function isCurrentDomain(domain) {
@@ -512,6 +652,8 @@
         panel.classList.remove('visible');
         saveState(state);
       }
+      // Also collapse any open sub-panels
+      bubble.querySelectorAll('.xb-sub').forEach((s) => { s.hidden = true; });
     }
   });
 

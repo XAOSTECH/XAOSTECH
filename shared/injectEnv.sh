@@ -24,10 +24,9 @@ sed -i "s/\${KV_PROGRESS_ID}/${KV_PROGRESS_ID}/g" "wrangler.toml"
 sed -i "s/\${D1_LEARNING_DB_ID}/${D1_LEARNING_DB_ID}/g" "wrangler.toml"
 sed -i "s/\${D1_ART_DB_ID}/${D1_ART_DB_ID}/g" "wrangler.toml"
 
-# AI Worker
+# AI Worker (no D1 — AI worker uses data-db via service binding to xaostech-data)
 sed -i "s/\${KV_AI_CACHE_ID}/${KV_AI_CACHE_ID}/g" "wrangler.toml"
 sed -i "s/\${KV_AI_TRAINING_ID}/${KV_AI_TRAINING_ID}/g" "wrangler.toml"
-sed -i "s/\${D1_AI_DB_ID}/${D1_AI_DB_ID}/g" "wrangler.toml"
 
 # Security Worker
 sed -i "s/\${KV_SECURITY_CACHE_ID}/${KV_SECURITY_CACHE_ID}/g" "wrangler.toml"
