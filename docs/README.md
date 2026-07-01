@@ -60,7 +60,7 @@
 - [Services](#-services)
 - [Documentation](#-documentation)
 - [Contributing](#-contributing)
-- [License](#-license)
+- [Licence](#-licence)
 
 ---
 
@@ -369,7 +369,7 @@ Security Policy: [SECURITY.md](SECURITY.md)
 
 ---
 
-## 📄 License
+## 📄 Licence
 
 Licensed under MIT. See [LICENSE](LICENSE).
 
