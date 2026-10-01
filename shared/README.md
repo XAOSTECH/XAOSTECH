@@ -1,4 +1,4 @@
-# Shared Resources Organization
+# Shared Resources Organisation
 
 This folder contains shared resources used across all XAOSTECH projects.
 

@@ -46,12 +46,12 @@ cd ../payments.xaostech.io && npx wrangler deploy --env production
 ## Phase 4: Test OAuth Flow
 1. Open https://account.xaostech.io
 2. Click "Sign in with GitHub"
-3. Authorize the app
+3. Authorise the app
 4. Should redirect back to account.xaostech.io and show your profile with avatar
 5. Test chat: https://chat.xaostech.io should show your avatar in messages
 6. Test blog: https://blog.xaostech.io should show your avatar on posts
 
-## Phase 5: Verify Session Behavior
+## Phase 5: Verify Session Behaviour
 ```bash
 # In browser console on chat.xaostech.io:
 fetch('/api/auth/me', { credentials: 'include' })
